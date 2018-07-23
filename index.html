@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.0/redux.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <p id="myValue"></p>
+  <button id="decrease">Decrease</button>
+  <button id="increase">Increase</button>
+  <button id="reset">RESET</button>
+  <br /><br />
+  <p id="myNewValue">0</p>
+  <button id="set">SET</button>
+  <script>
+
+    const myValue = document.getElementById('myValue');
+    const increase = document.getElementById('increase');
+    const decrease = document.getElementById('decrease');
+    const reset = document.getElementById('reset');
+
+    const myNewValue = document.getElementById('myNewValue');
+    const set = document.getElementById('set');
+
+    const INITIAL_COUNTER_STATE = {
+      value: 100
+    }
+
+    const INITIAL_VALUE_STATE = {
+      myValue: 0
+    }
+
+    myValue.innerHTML = INITIAL_COUNTER_STATE.value;
+
+    //this is action function which require type compulsary
+    const increaseValue = () => {
+      return {
+        type: 'INCREMENT'
+      }
+    }
+
+    const decreaseValue = () => {
+      return {
+        type: 'DECREMENT'
+      }
+    }
+
+    const resetValue = () => {
+      return {
+        type: 'RESET'
+      }
+    }
+
+    const myCounterReducer = (state = INITIAL_COUNTER_STATE, action) => {
+      switch(action.type) {
+        case 'INCREMENT':
+          return Object.assign({}, state, { value: state.value + 1 });
+        case 'DECREMENT':
+          return Object.assign({}, state, { value: state.value - 1 });
+        case 'RESET':
+          return Object.assign({}, state, { value: INITIAL_COUNTER_STATE.value });
+        default:
+          return state;
+      }
+    }
+
+    const setMyValue = (value) => {
+      return {
+        type: 'SET_VALUE',
+        payload: {
+          value
+        }
+      }
+    }
+
+    const myValueReducer = (state = INITIAL_VALUE_STATE, action) => {
+      switch(action.type) {
+        case 'SET_VALUE':
+          return Object.assign({}, state, { myValue: action.payload.value });
+        default:
+          return state;
+      }
+    }
+
+    const reducers = Redux.combineReducers({
+      counter: myCounterReducer,
+      values: myValueReducer
+    })
+
+
+    const myStore = Redux.createStore(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+
+    myStore.subscribe(() => {
+      myValue.innerHTML = myStore.getState().counter.value;
+      myNewValue.innerHTML = myStore.getState().values.myValue;
+    });
+
+    increase.onclick = () => {
+      myStore.dispatch(increaseValue())
+    }
+
+    decrease.onclick = () => {
+      myStore.dispatch(decreaseValue())
+    }
+
+    reset.onclick = () => {
+      myStore.dispatch(resetValue())
+    }
+
+    set.onclick = () => {
+      myStore.dispatch(setMyValue(1000))
+    }
+  </script>
+</body>
+</html>
